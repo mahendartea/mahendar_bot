@@ -25,7 +25,9 @@ bot.command("doa", async (ctx) => {
         const randomArtinya = data[randomIndex].artinya;
         const randomLatin = data[randomIndex].latin;
 
-        await ctx.reply("Hai, ini doa : " + randomDoa + "\n" + "Ayat : " + randomAyat + "\n" + "Artinya : " + randomArtinya + "\n" + "Latin : " + randomLatin);
+        const replyMessage = `Doa : ${randomDoa}\nAyat : ${randomAyat}\nArtinya : ${randomArtinya}\nLatin : ${randomLatin}`;
+
+        await ctx.reply(replyMessage);
     } catch (error) {
         console.error("Error fetching doa data:", error);
         await ctx.reply("Maaf, terjadi kesalahan saat mengambil data doa.");
