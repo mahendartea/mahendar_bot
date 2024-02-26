@@ -5,16 +5,39 @@ require("dotenv").config();
 
 const bot = new Bot(process.env.BOT_TOKEN);
 
+const dataDoa = async () => {
+    const response = await fetch("https://doa-doa-api-ahmadramadhan.fly.dev/api");
+    const data = await response.json();
+    return data;
+}
+
+// dataDoa().then((data) => {
+//     const random = Math.floor(Math.random() * data.length);
+//     console.log({ id: data[random].id, doa: data[random].doa, ayat: data[random].ayat, latih: data[random].latihan, artinya: data[random].artinya });
+// })
+
+bot.command("doa", async (ctx) => {
+    try {
+        const data = await dataDoa();
+        const randomIndex = Math.floor(Math.random() * data.length);
+        const randomDoa = data[randomIndex].doa;
+        const randomAyat = data[randomIndex].ayat;
+        const randomArtinya = data[randomIndex].artinya;
+        const randomLatin = data[randomIndex].latin;
+
+        await ctx.reply("Hai, ini doa : " + randomDoa + "\n" + "Ayat : " + randomAyat + "\n" + "Artinya : " + randomArtinya + "\n" + "Latin : " + randomLatin);
+    } catch (error) {
+        console.error("Error fetching doa data:", error);
+        await ctx.reply("Maaf, terjadi kesalahan saat mengambil data doa.");
+    }
+})
+
 bot.command("start", (ctx) => ctx.reply("Selamat Datang di Bot Hendartea!"));
 bot.command("info", (ctx) => ctx.reply("Hai, Saya adalah bot-nya Bapak Mahendar Dwi Payana (hendartea_bot_telegram)"));
 bot.command("fitri", (ctx) => ctx.reply("Hai Fitri istri majikan yang paling dicintainya...❤️ ️"))
-// bot.on("message", (ctx) => ctx.reply("Got another message!"));
 bot.on("message", async (ctx) => {
-    // Get the text of the message.
     const text = ctx.msg.text;
     const chatId = ctx.msg.chat.id;
-    // console.log(chatId, text);
-    // // Send the reply.
     await bot.api.sendMessage(chatId, 'Hai hanya balas pesan anda yaitu : ' + text);
 });
 
