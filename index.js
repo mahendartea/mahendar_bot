@@ -35,6 +35,7 @@ bot.command("start", (ctx) => ctx.reply(`
         Selamat datang di bot hendartea_bot. Jalankan perintah ini di Telegram. \n
         /doa : untuk melihat Doa harian \n
         /info : untuk melihat info \n
+        /buku 'kata kunci': untuk melihat buku (contoh: /buku php)
 `));
 bot.command("info", (ctx) => ctx.reply("Hai, Saya adalah bot-nya Bapak Mahendar Dwi Payana (hendartea_bot_telegram)"));
 bot.command("fitri", (ctx) => ctx.reply("Hai Fitri istri majikan yang paling dicintainya...❤️ ️"))
