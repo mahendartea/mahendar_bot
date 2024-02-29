@@ -1,5 +1,6 @@
 const { Bot, webhookCallback } = require("grammy");
 const express = require("express");
+const axios = require("axios");
 
 require("dotenv").config();
 
@@ -11,10 +12,6 @@ const dataDoa = async () => {
     return data;
 }
 
-// dataDoa().then((data) => {
-//     const random = Math.floor(Math.random() * data.length);
-//     console.log({ id: data[random].id, doa: data[random].doa, ayat: data[random].ayat, latih: data[random].latihan, artinya: data[random].artinya });
-// })
 
 bot.command("doa", async (ctx) => {
     try {
@@ -34,14 +31,55 @@ bot.command("doa", async (ctx) => {
     }
 })
 
-bot.command("start", (ctx) => ctx.reply("Selamat Datang di Bot Hendartea!"));
+bot.command("start", (ctx) => ctx.reply(`
+        Selamat datang di bot hendartea_bot. Jalankan perintah ini di Telegram. \n
+        /doa : untuk melihat Doa harian \n
+        /info : untuk melihat info \n
+`));
 bot.command("info", (ctx) => ctx.reply("Hai, Saya adalah bot-nya Bapak Mahendar Dwi Payana (hendartea_bot_telegram)"));
 bot.command("fitri", (ctx) => ctx.reply("Hai Fitri istri majikan yang paling dicintainya...❤️ ️"))
-bot.on("message", async (ctx) => {
-    const text = ctx.msg.text;
-    const chatId = ctx.msg.chat.id;
-    await bot.api.sendMessage(chatId, 'Hai hanya balas pesan anda yaitu : ' + text);
+
+// from rapitapi.com filepursuit
+bot.command("buku", async (ctx) => {
+    try {
+        const query = ctx.message.text.split(" ").slice(1).join(" "); // Mengambil argumen setelah perintah '/buku'
+
+        // Membuat opsi dengan query yang diberikan pengguna
+        const options = {
+            method: 'GET',
+            url: 'https://filepursuit.p.rapidapi.com/',
+            params: {
+                q: query, // Menggunakan nilai query dari pengguna
+                filetype: 'pdf',
+                type: 'ebook',
+                sort: 'asc',
+                start: '5'
+            },
+            headers: {
+                'X-RapidAPI-Key': process.env.RAPIT_API,
+                'X-RapidAPI-Host': process.env.RAPIT_HOST
+            }
+        };
+
+        const response = await axios.request(options);
+        const books = response.data;
+
+        if (books.status === "success" && books.files_found.length > 0) {
+            // Mengambil satu buku secara acak dari daftar buku yang ditemukan
+            const randomIndexBooks = Math.floor(Math.random() * books.files_found.length);
+            const randomBook = books.files_found[randomIndexBooks];
+
+            await ctx.reply(`Nama file: ${randomBook.file_name}\nLink: ${randomBook.file_link}`);
+            console.log(books);
+        } else {
+            await ctx.reply("Maaf, tidak ada buku yang ditemukan dengan kata kunci tersebut.");
+        }
+    } catch (error) {
+        console.error("Error fetching book data:", error);
+        await ctx.reply("Maaf, terjadi kesalahan saat mengambil data buku.");
+    }
 });
+
 
 if (process.env.NODE_ENV === "production") {
     const app = express();
